@@ -18,13 +18,13 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
-// MongoDB connection
-mongoose.connect(databaseURL, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log("DB Connection Successful"))
-    .catch(err => console.log("DB Connection Error: " + err.message));
-
 // Server listening
 const server = app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
+
+// MongoDB connection
+mongoose.connect(databaseURL, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log("DB Connection Successful"))
+    .catch(err => console.log("DB Connection Error: " + err.message));
 

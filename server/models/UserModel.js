@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+import {genSalt} from "bcrypt"
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -34,8 +34,8 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function(next) {
     // If password has been modified (or if it's a new document), hash it
     if (this.isModified('password')) {
-      const salt = await bcrypt.genSalt(10); // Generate salt with 10 rounds
-      this.password = await bcrypt.hash(this.password, salt); // Hash the password
+      const salt = await genSalt(10); // Generate salt with 10 rounds
+      this.password = await hash(this.password, salt); // Hash the password
     }
     next(); // Continue with saving the document
   });
