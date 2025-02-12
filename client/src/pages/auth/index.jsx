@@ -6,12 +6,28 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import { useState } from "react";
 import { apiClient } from "@/lib/api-client";
 import { toast } from "sonner";
+import { SIGNUP_ROUTE } from "@/utils/constants";
+import { LOGIN_ROUTE } from "@/utils/constants";
+import { useNavigate } from "react-router-dom";
 const Auth = () => {
+  const navigate = useNavigate()
   const [email, setEmail] = useState("")
 
   const [password, setPassword] = useState("")
   
   const [confirmPassword, setConfirmPassword] = useState("")
+
+  const validatesLogin = () => {
+    if (!email.length) {
+      toast.error("Email is required.");
+      return false;
+    }
+    if (!password.length){
+      toast.error("Password is required.");
+      
+    }
+    return true;
+  };
 
   const validateSignup = () => {
     if (!email.length) {
@@ -29,13 +45,36 @@ const Auth = () => {
     return true;
   };
   
-  const handleLogin=async ()=> {};
-  const handleSignup = async () =>{
-    if(validateSignup()){
-      const response = await apiClient.post(SIGNUP_ROUTE, { email, password})
-      console.log({ respose });
+  const handleLogin=async () => {
+    if(validatesLogin()){
+      const response = await apiClient.post(
+        LOGIN_ROUTE, 
+        { email, password }, 
+        { withCredentials: true }
+      );
+        console.log({ response });
+    }
+    if(response.data.user.id){
+      if(response.data.user.profileSetup){
+        nagigate("/chat");
+      }
+      else{
+        navigate("/profile");
+      }
     }
   };
+
+  const handleSignup = async () => {
+    if(validateSignup()){
+      const response = await apiClient.post(
+        SIGNUP_ROUTE, { email, password}, {withCredentials:true});
+      console.log({ response });
+    }
+    if(response.status===201){
+      navigate("/profile");
+    }
+  };
+  
   return (
     <div className="h-[100vh] w-[100vw] flex items-center justify-center">
       <div className= "h-[80vh] bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vw] md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2" >
@@ -50,7 +89,7 @@ const Auth = () => {
             </p>
           </div> 
           <div className="flex items-center justify-center w-full">
-            <Tabs className="w-3/4">
+            <Tabs className="w-3/4" defaultValue="login">
               <TabsList className="bg-transparent rounded-none w-full flex">
                 <TabsTrigger 
                   value="login" 
