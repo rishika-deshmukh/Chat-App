@@ -9,13 +9,17 @@ import { toast } from "sonner";
 import { SIGNUP_ROUTE } from "@/utils/constants";
 import { LOGIN_ROUTE } from "@/utils/constants";
 import { useNavigate } from "react-router-dom";
+import { useAppStore } from "@/store";
 const Auth = () => {
   const navigate = useNavigate()
-  const [email, setEmail] = useState("")
 
-  const [password, setPassword] = useState("")
+  const { setUserInfo } = useAppStore();
+
+  const [email, setEmail] = useState("");
+
+  const [password, setPassword] = useState("");
   
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const validatesLogin = () => {
     if (!email.length) {
@@ -45,25 +49,39 @@ const Auth = () => {
     return true;
   };
   
-  const handleLogin=async () => {
-    if(validatesLogin()){
-      const response = await apiClient.post(
-        LOGIN_ROUTE, 
-        { email, password }, 
-        { withCredentials: true }
-      );
-        console.log({ response });
-    }
-    if(response.data.user.id){
-      if(response.data.user.profileSetup){
-        nagigate("/chat");
-      }
-      else{
-        navigate("/profile");
+  const handleLogin = async () => {
+    if (validatesLogin()) {
+      try {
+        // Make the API request
+        const response = await apiClient.post(
+          LOGIN_ROUTE, 
+          { email, password }, 
+          { withCredentials: true }
+        );
+  
+        // Check if the response has the required properties
+        if (response && response.data && response.data.user) {
+          if (response.data.user.id) {
+            setUserInfo(response.data.user);
+            // Check if the user has completed their profile setup
+            if (response.data.user.profileSetup) {
+              navigate("/chat"); // Redirect to chat if profile is set up
+            } else {
+              navigate("/profile"); // Redirect to profile setup if not
+            }
+          }
+        } else {
+          // Handle the case where the response doesn't have the expected structure
+          toast.error("Login failed: User data not found.");
+        }
+      } catch (error) {
+        // Handle errors during the API request
+        console.error("Login error:", error);
+        toast.error("An error occurred while logging in. Please try again.");
       }
     }
   };
-
+  
   const handleSignup = async () => {
     if(validateSignup()){
       const response = await apiClient.post(
@@ -71,6 +89,7 @@ const Auth = () => {
       console.log({ response });
     }
     if(response.status===201){
+      setUserInfo(response.data.user);
       navigate("/profile");
     }
   };
