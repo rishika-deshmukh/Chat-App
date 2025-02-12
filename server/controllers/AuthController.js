@@ -1,7 +1,7 @@
 import User from "../models/UserModel";
 import {sign} from "jsonwebtoken"
 const maxAge = 3 * 24 * 60 * 1000;
-const createToken = {email,userId}=>{
+const createToken = (email,userId)=>{
     return sign({email, userId},process.env.JWT_KEY,{expiresIn: maxAge})
 }
 export const signup = async(request, response, next)=>{
@@ -14,7 +14,7 @@ export const signup = async(request, response, next)=>{
         const user = await User.create({email, password});
         response.cookie("jwt",createToken(email,user.id),{
             maxAge,
-            secure:true;
+            secure:true,
             sameSite: "None",
         })
         return response.status(201).json({user:{
