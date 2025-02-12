@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import { useState } from "react";
+import { apiClient } from "@/lib/api-client";
+import { toast } from "sonner";
 const Auth = () => {
   const [email, setEmail] = useState("")
 
@@ -11,8 +13,29 @@ const Auth = () => {
   
   const [confirmPassword, setConfirmPassword] = useState("")
 
+  const validateSignup = () => {
+    if (!email.length) {
+      toast.error("Email is required.");
+      return false;
+    }
+    if (!password.length){
+      toast.error("Password is required.");
+      
+    }
+    if(password !==confirmPassword){
+      toast.error("Password and confirmed password should be same");
+      return false;
+    }
+    return true;
+  };
+  
   const handleLogin=async ()=> {};
-  const handleSignup = async () =>{};
+  const handleSignup = async () =>{
+    if(validateSignup()){
+      const response = await apiClient.post(SIGNUP_ROUTE, { email, password})
+      console.log({ respose });
+    }
+  };
   return (
     <div className="h-[100vh] w-[100vw] flex items-center justify-center">
       <div className= "h-[80vh] bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vw] md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2" >
