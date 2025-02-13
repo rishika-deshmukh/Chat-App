@@ -32,6 +32,7 @@ export const signup = async(request, response, next)=>{
         return response.status(500).send("Internal server error.");
     }
 };
+
 export const login = async(request, response, next)=>{
     try{
         const {email, password}= request.body;
@@ -70,33 +71,24 @@ export const login = async(request, response, next)=>{
     }
 };
 
-export const getUserInfo = async (request, response, next) => {
+export const getuserInfo = async (request, response) => {
     try {
-      const token = request.cookies.jwt;
-      if (!token) {
-        return response.status(401).send("Unauthorized access.");
-      }
-  
-      const decoded = jwt.verify(token, process.env.JWT_KEY);
-      const user = await User.findById(decoded.userId);
-  
-      if (!user) {
-        return response.status(404).send("User not found.");
-      }
-  
-      return response.status(200).json({
-        user: {
-          id: user.id,
-          email: user.email,
-          profileSetup: user.profileSetup,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          image: user.image,
-          color: user.color,
-        },
-      });
+        const userData = await User.findById(request.userId);
+        if (!userData) {
+            return response.status(404).send("User with the given ID not found.");
+        }
+
+        return response.status(200).json({
+            id: userData.id,
+            email: userData.email,
+            profileSetup: userData.profileSetup,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            image: userData.image,
+            color: userData.color,
+        });
     } catch (error) {
-      console.error("Get User Info Error:", error);
-      return response.status(500).send("Internal server error.");
+        console.log({ error });
+        return response.status(500).send("Internal Server Error");
     }
-  };
+};

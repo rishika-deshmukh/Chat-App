@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Auth from "./pages/auth";
@@ -14,7 +13,7 @@ const PrivateRoute = ({ children }) => {
 
 const AuthRoute = ({ children }) => {
   const { userInfo } = useAppStore();
-  return userInfo ? children : <Navigate to="/auth" />;
+  return userInfo ? <Navigate to="/chat" /> : children;
 };
 
 const App = () => {
@@ -24,14 +23,18 @@ const App = () => {
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const response = await apiClient.get("/user/info", {
+        const response = await apiClient.get("/GET_USER_INFO", {
           withCredentials: true,
         });
-        if (response.data) {
+
+        if (response.status === 200 && response.data?.id) {
           setUserInfo(response.data);
+        } else {
+          setUserInfo(undefined);
         }
+        console.log({ response })
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        setUserInfo(undefined);
       } finally {
         setLoading(false);
       }

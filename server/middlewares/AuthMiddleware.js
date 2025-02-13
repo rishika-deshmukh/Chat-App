@@ -1,21 +1,15 @@
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (request, response, next) => {
-    console.log(request.cookies); // Corrected `req` to `request`
-    
-    const token = request.cookies.jwt; // Corrected `cookie` to `cookies`
-    console.log({ token });
+    const token = request.cookies.jwt;
 
-    if (!token) {
-        return response.status(401).json({ message: "Access denied. No token provided." });
-    }
+    if (!token) return response.status(401).send("You are not authenticated!");
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_KEY);
-        request.user = decoded; // Attach user data to request
+    jwt.verify(token, process.env.JWT_KEY, (err, payload) => {
+        if (err) return response.status(403).send("Token is not valid!");
+        
+        request.userId = payload.userId;
         next(); // Call next middleware
-    } catch (error) {
-        console.error("Token verification error:", error);
-        return response.status(403).json({ message: "Invalid or expired token." });
-    }
+    });
 };
+
