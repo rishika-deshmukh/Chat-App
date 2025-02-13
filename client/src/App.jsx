@@ -4,7 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Auth from "./pages/auth";
 import Profile from "./pages/profile";
 import Chat from "./pages/chat";
-import { useAppStore } from "./store/appStore";
+import { useAppStore } from "./store";
 import { apiClient } from "./lib/api-client";
 
 const PrivateRoute = ({ children }) => {
