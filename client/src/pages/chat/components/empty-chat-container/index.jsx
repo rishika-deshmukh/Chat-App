@@ -7,7 +7,7 @@ const EmptyChatContainer= () => {
             isClickToPauseDisabled={true}
             height={200}
             width={200}
-            options={}
+            options={animationDefaultOptions}
             />
         </div>
     );
