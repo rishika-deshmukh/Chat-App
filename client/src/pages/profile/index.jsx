@@ -2,13 +2,14 @@ import { useAppStore } from "@/store";  // Ensure correct capitalization
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
-import { getColor } from "@/lib/utils";
+import { colors,getColor } from "@/lib/utils";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { Avatar, AvatarImage } from "@/components/ui/avatar"; // Ensure this component exists
-
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 const Profile = () => {
   const navigate = useNavigate();
-  const { userInfo } = useAppStore();  // Ensure store is correctly set up
+  const { userInfo, setUserInfo } = useAppStore();  // Ensure store is correctly set up
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [image, setImage] = useState(null);
@@ -43,19 +44,53 @@ const Profile = () => {
                 <div
                   className={`uppercase h-32 w-32 md:w-48 md:h-48 border-[1px] text-5xl flex items-center justify-center rounded-full ${getColor(selectedColor)}`}
                 >
-                  {firstName ? firstName.charAt(0) : userInfo?.email?.charAt(0)}
+                  {firstName ? firstName.split("") : userInfo?.email.split("").shift()}
                 </div>
               )}
             </Avatar>
 
             {hovered && (
               <div className="absolute bottom-2 right-2 bg-black/50 p-2 rounded-full">
-                {image ? <FaTrash className="text-white" /> : <FaPlus className="text-white" />}
+                {image ? ( <FaTrash className="text-white text-3xl cursor-pointer" />) : (<FaPlus className="text-white text-3xl cursor-pointer" />)}
               </div>
             )}
+            {/*<input type="text"/>*/}
+          </div>
+          <div classname="flex min-w-32 md:min-w-64 flex-col gap-5 text-white items-center justify-center">
+            <div classname="w-full">
+              <Input placeholder="Email" type="email" disabled value={userInfo.email} className="rounded-lg p-6 bg-[#2c2e3b] border-none"/>
+            </div>
+
+            <div classname="w-full">
+              <Input placeholder="First Name" type="text" onChange={(e)=>setFirstName(e.target.value)} value={firstName} className="rounded-lg p-6 bg-[#2c2e3b] border-none"/>
+            </div>
+          
+            <div classname="w-full">
+              <Input placeholder="Last Name" type="text" onChange={(e)=>setLastName(e.target.value)} value={lastName} className="rounded-lg p-6 bg-[#2c2e3b] border-none"/>
+            </div>
+            <div className="w-full flex gap-5">
+              {colors.map((color,index)=> (
+              <div 
+                className={`${color} h-8 w-8 rounded-full cursor-pointer transition-all duration-300 
+                  ${selectedColor ===index ? "outline outline-white/50 outline-1"
+                  :""
+                }}
+                  `} 
+                key={index}
+                onClick={() => setSelectedColor(index)}
+              ></div>
+            ))}
+          </div>
           </div>
         </div>
-      </div>
+        <div className="w-full">
+          <Button className="h-16 w-full bg-purple-700 hover:bg-purple-900 transition-all duration-300"
+          onClick={saveChanges}
+          >
+              Save Changes
+          </Button>
+        </div>
+        </div>
     </div>
   );
 };
